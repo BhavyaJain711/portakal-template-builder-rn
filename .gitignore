@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.expo/
+*.log
+*.svg
+*.prn
+.packed/
+*.tgz
+

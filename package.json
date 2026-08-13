@@ -1,0 +1,69 @@
+{
+  "name": "portakal-template-builder-rn",
+  "version": "0.0.1",
+  "description": "React Native template builder for portakal-template. Visual row/cell/element editor with slash-command variable autocomplete, live SVG preview, validation, and theming. Expo-first, works on iOS, Android, tablet, and web.",
+  "keywords": [
+    "printer",
+    "label-printer",
+    "thermal-printer",
+    "tsc",
+    "tspl",
+    "zpl",
+    "template",
+    "builder",
+    "editor",
+    "react-native",
+    "expo",
+    "preview"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm run typecheck && npm test"
+  },
+  "peerDependencies": {
+    "portakal-template": "^0.0.1",
+    "react": ">=18",
+    "react-native": ">=0.72",
+    "react-native-svg": ">=14"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
+    },
+    "portakal-template": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.79",
+    "react": "18.2.0",
+    "react-native": "^0.74.5",
+    "react-native-svg": "^15.2.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}
