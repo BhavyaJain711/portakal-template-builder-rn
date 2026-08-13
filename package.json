@@ -1,6 +1,6 @@
 {
   "name": "portakal-template-builder-rn",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "React Native template builder for portakal-template. Visual row/cell/element editor with slash-command variable autocomplete, live SVG preview, validation, and theming. Expo-first, works on iOS, Android, tablet, and web.",
   "keywords": [
     "printer",
