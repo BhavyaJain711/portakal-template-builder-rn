@@ -5,7 +5,7 @@
  * layout). Shows validation errors and an optional compiled TSC/ZPL view.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { compileTemplate } from "portakal-template";
@@ -72,6 +72,23 @@ export function PreviewPanel({
 
   const needsCompile = manualPreview && (compiled === null || stale);
 
+  // Compute aspect ratio from SVG viewBox or printer spec to give the preview container
+  // deterministic layout bounds, preventing infinite layout loops on mobile inside ScrollView.
+  const aspectRatio = useMemo(() => {
+    if (compiled?.svg) {
+      const match = compiled.svg.match(/viewBox=["']\d+\s+\d+\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)["']/);
+      if (match && match[1] && match[2]) {
+        const w = parseFloat(match[1]);
+        const h = parseFloat(match[2]);
+        if (w > 0 && h > 0) return w / h;
+      }
+    }
+    if (spec.width && spec.height && spec.height > 0) {
+      return spec.width / spec.height;
+    }
+    return 1.5;
+  }, [compiled?.svg, spec.width, spec.height]);
+
   return (
     <View style={{ backgroundColor: c.surface, borderRadius: radius, padding: spacing, marginBottom: spacing, borderWidth: 1, borderColor: c.border }}>
       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: spacing * 0.6 }}>
@@ -109,7 +126,11 @@ export function PreviewPanel({
           padding: spacing,
           alignItems: "center",
           justifyContent: "center",
-          minHeight: 180,
+          width: "100%",
+          aspectRatio,
+          maxHeight: 320,
+          alignSelf: "center",
+          overflow: "hidden",
         }}
       >
         {compiled ? (
@@ -145,7 +166,7 @@ export function PreviewPanel({
             </Text>
           </TouchableOpacity>
           {showCodePanel && compiled && (
-            <ScrollView style={{ maxHeight: 220, marginTop: spacing * 0.6, backgroundColor: c.background, borderRadius: radius, padding: spacing * 0.7 }}>
+            <ScrollView nestedScrollEnabled style={{ maxHeight: 220, marginTop: spacing * 0.6, backgroundColor: c.background, borderRadius: radius, padding: spacing * 0.7 }}>
               <Text style={{ color: c.text, fontSize: fs.small, fontFamily: "monospace" }}>{compiled.tsc}</Text>
               <View style={{ height: spacing }} />
               <Text style={{ color: c.textMuted, fontSize: fs.small, fontWeight: "700" }}>ZPL II</Text>

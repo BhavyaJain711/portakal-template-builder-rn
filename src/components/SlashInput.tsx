@@ -10,7 +10,7 @@
  */
 
 import { useMemo, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import type { BuilderTheme, VariableSpec } from "../types.js";
 import { applySuggestion, detectToken, repeatFieldOf, suggestVariables } from "../state/slash.js";
 import { VariableHelpModal } from "./VariableHelpModal.js";
@@ -124,18 +124,17 @@ export function SlashInput({
             borderWidth: 1,
             borderRadius: radius,
             overflow: "hidden",
+            maxHeight: 180,
           }}
         >
-          <FlatList
-            data={suggestions}
-            keyExtractor={(v) => v.key}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => {
+          <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled>
+            {suggestions.map((item) => {
               const field = repeatFieldOf(item.key, repeatLists);
               const isStringList = stringLists.includes(item.key);
               const shownKey = field ? field.field : isStringList ? "this" : item.key;
               return (
                 <TouchableOpacity
+                  key={item.key}
                   onPress={() => accept(item.key)}
                   style={{ paddingHorizontal: spacing, paddingVertical: spacing * 0.5, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.border }}
                 >
@@ -147,8 +146,8 @@ export function SlashInput({
                   <Text style={{ color: c.textMuted, fontSize: fs.small }}>{item.description}</Text>
                 </TouchableOpacity>
               );
-            }}
-          />
+            })}
+          </ScrollView>
         </View>
       )}
 
