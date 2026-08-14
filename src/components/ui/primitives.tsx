@@ -3,7 +3,7 @@
  * (TouchableOpacity, Text, View). Works on iOS, Android, tablet, and web.
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal as RNModal,
   ScrollView,
@@ -197,10 +197,33 @@ export function NumberField({
 }) {
   const { c, spacing, radius, fs } = useThemeStyles(theme);
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
-  // Clamp on blur so a partial "3" or "37." doesn't stick as invalid.
+  const fmt = (n: number) => String(Math.round(n * 100) / 100);
+  // Keep a local draft so typing "3" then "0" yields "30" instead of the
+  // controlled value re-selecting the text and overwriting the first digit.
+  const [text, setText] = useState(() => fmt(value || 0));
+
+  // Sync the draft from external value changes (stepper, undo, prop update),
+  // but never clobber what the user is currently typing.
+  useEffect(() => {
+    setText((prev) => (parseFloat(prev) === value ? prev : fmt(value)));
+  }, [value]);
+
+  // Commit a valid parsed float while typing; final clamp/format happens on blur.
   const commit = (raw: string) => {
+    setText(raw);
     const n = parseFloat(raw.replace(",", "."));
     if (Number.isFinite(n)) onChange(clamp(n));
+  };
+  const handleBlur = () => {
+    const n = parseFloat(text.replace(",", "."));
+    if (Number.isFinite(n)) {
+      const clamped = clamp(n);
+      onChange(clamped);
+      setText(fmt(clamped));
+    } else {
+      // Empty or incomplete input (e.g. just "-") — restore the last value.
+      setText(fmt(value));
+    }
   };
   const btn = (char: string, delta: number) => (
     <TouchableOpacity
@@ -215,11 +238,11 @@ export function NumberField({
       <Text style={{ color: c.textMuted, fontSize: fs.small, width: 96, marginRight: spacing * 0.4 }}>{label}</Text>
       {btn("−", -step)}
       <TextInput
-        value={String(Math.round(value * 100) / 100)}
+        value={text}
         onChangeText={(raw) => commit(raw)}
-        onBlur={() => onChange(clamp(value))}
+        onBlur={handleBlur}
         keyboardType={allowDecimal ? "decimal-pad" : "number-pad"}
-        selectTextOnFocus
+        selectTextOnFocus={false}
         style={{
           color: c.text,
           fontSize: fs.body,

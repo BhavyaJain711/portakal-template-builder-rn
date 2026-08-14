@@ -48,7 +48,8 @@ export function PreviewPanel({
       setCompiled({ tsc: result.tsc, zpl: result.zpl, svg: result.svg });
       onPreview?.({ tsc: result.tsc, zpl: result.zpl, svg: result.svg });
       setStale(false);
-    } catch {
+    } catch (err) {
+      console.warn("PreviewPanel compileTemplate error:", err);
       setCompiled(null);
       setStale(false);
     }

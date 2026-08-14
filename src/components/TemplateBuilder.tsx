@@ -110,6 +110,14 @@ export function TemplateBuilder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template]);
 
+  // Re-sync the live preview when the parent passes a new spec or sample data.
+  useEffect(() => {
+    setSpecState(spec);
+  }, [spec]);
+  useEffect(() => {
+    setSampleState(sampleData);
+  }, [sampleData]);
+
   const validation = useMemo(
     () =>
       validateTemplate(schema, {
